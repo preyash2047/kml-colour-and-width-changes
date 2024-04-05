@@ -1,0 +1,17 @@
+{
+  "name": "kml-testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "text.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@turf/turf": "^6.5.0",
+    "geojson-to-kml": "^0.0.1",
+    "xmldom": "^0.6.0"
+  }
+}
