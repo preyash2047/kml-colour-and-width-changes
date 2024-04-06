@@ -24,75 +24,87 @@ class KMLUtility {
             this.serializer = new XMLSerializer();
             this.xmlDoc = this.parser.parseFromString(this.kmlString, 'text/xml');
         } catch (error) {
-            console.error('Error fetching KML from URL:', error);
+            throw new Error('Error fetching KML from URL: ' + error.message);
         }
     }
 
     applyLineColour(lineColour) {
-        const styleNodes = this.xmlDoc.getElementsByTagName('Style');
-        for (let i = 0; i < styleNodes.length; i++) {
-            const styleNode = styleNodes[i];
-            const lineStyleNode = styleNode.getElementsByTagName('LineStyle')[0];
+        try {
+            const styleNodes = this.xmlDoc.getElementsByTagName('Style');
+            for (let i = 0; i < styleNodes.length; i++) {
+                const styleNode = styleNodes[i];
+                const lineStyleNode = styleNode.getElementsByTagName('LineStyle')[0];
 
-            if (!lineStyleNode) {
-                const newLineStyleNode = this.xmlDoc.createElement('LineStyle');
-                styleNode.appendChild(newLineStyleNode);
+                if (!lineStyleNode) {
+                    const newLineStyleNode = this.xmlDoc.createElement('LineStyle');
+                    styleNode.appendChild(newLineStyleNode);
+                }
+
+                const widthNode = lineStyleNode.getElementsByTagName('width')[0] || this.xmlDoc.createElement('width');
+                widthNode.textContent = '4'; // Set line width to 4
+                lineStyleNode.appendChild(widthNode);
+
+                const colorNode = lineStyleNode.getElementsByTagName('color')[0] || this.xmlDoc.createElement('color');
+                colorNode.textContent = this.rgbToKMLColor(lineColour, 50); // Set line color
+                lineStyleNode.appendChild(colorNode);
             }
-
-            const widthNode = lineStyleNode.getElementsByTagName('width')[0] || this.xmlDoc.createElement('width');
-            widthNode.textContent = '4'; // Set line width to 4
-            lineStyleNode.appendChild(widthNode);
-
-            const colorNode = lineStyleNode.getElementsByTagName('color')[0] || this.xmlDoc.createElement('color');
-            colorNode.textContent = this.rgbToKMLColor(lineColour, 50); // Set line color
-            lineStyleNode.appendChild(colorNode);
+        } catch (error) {
+            throw new Error('Error applying line colour to KML: ' + error.message);
         }
     }
 
     applyFillColour(fillColour, transparency) {
-        const styleNodes = this.xmlDoc.getElementsByTagName('Style');
-        for (let i = 0; i < styleNodes.length; i++) {
-            const styleNode = styleNodes[i];
-            const polyStyleNode = styleNode.getElementsByTagName('PolyStyle')[0];
+        try {
+            const styleNodes = this.xmlDoc.getElementsByTagName('Style');
+            for (let i = 0; i < styleNodes.length; i++) {
+                const styleNode = styleNodes[i];
+                const polyStyleNode = styleNode.getElementsByTagName('PolyStyle')[0];
 
-            if (!polyStyleNode) {
-                const newPolyStyleNode = this.xmlDoc.createElement('PolyStyle');
-                styleNode.appendChild(newPolyStyleNode);
+                if (!polyStyleNode) {
+                    const newPolyStyleNode = this.xmlDoc.createElement('PolyStyle');
+                    styleNode.appendChild(newPolyStyleNode);
+                }
+
+                const colorNode = polyStyleNode.getElementsByTagName('color')[0] || this.xmlDoc.createElement('color');
+                colorNode.textContent = this.rgbToKMLColor(fillColour, transparency); // Set fill color with transparency
+                polyStyleNode.appendChild(colorNode);
             }
-
-            const colorNode = polyStyleNode.getElementsByTagName('color')[0] || this.xmlDoc.createElement('color');
-            colorNode.textContent = this.rgbToKMLColor(fillColour, transparency); // Set fill color with transparency
-            polyStyleNode.appendChild(colorNode);
+        } catch (error) {
+            throw new Error('Error applying fill colour to KML: ' + error.message);
         }
     }
 
     applyLineWidth(lineWidth) {
-        const styleNodes = this.xmlDoc.getElementsByTagName('Style');
-        for (let i = 0; i < styleNodes.length; i++) {
-            const styleNode = styleNodes[i];
-            const lineStyleNode = styleNode.getElementsByTagName('LineStyle')[0];
-            if (lineStyleNode) {
-                const widthNode = lineStyleNode.getElementsByTagName('width')[0];
-                if (widthNode) {
-                    widthNode.textContent = lineWidth.toString(); // Set line width
-                } else {
-                    const newWidthNode = this.xmlDoc.createElement('width');
-                    newWidthNode.textContent = lineWidth.toString();
-                    lineStyleNode.appendChild(newWidthNode);
+        try {
+            const styleNodes = this.xmlDoc.getElementsByTagName('Style');
+            for (let i = 0; i < styleNodes.length; i++) {
+                const styleNode = styleNodes[i];
+                const lineStyleNode = styleNode.getElementsByTagName('LineStyle')[0];
+                if (lineStyleNode) {
+                    const widthNode = lineStyleNode.getElementsByTagName('width')[0];
+                    if (widthNode) {
+                        widthNode.textContent = lineWidth.toString(); // Set line width
+                    } else {
+                        const newWidthNode = this.xmlDoc.createElement('width');
+                        newWidthNode.textContent = lineWidth.toString();
+                        lineStyleNode.appendChild(newWidthNode);
+                    }
                 }
-            }
 
-            const polyStyleNode = styleNode.getElementsByTagName('PolyStyle')[0];
-            if (polyStyleNode) {
-                const widthNode = polyStyleNode.getElementsByTagName('width')[0];
-                if (widthNode) {
-                    widthNode.textContent = lineWidth.toString(); // Set line width for polygon
-                } else {
-                    const newWidthNode = this.xmlDoc.createElement('width');
-                    newWidthNode.textContent = lineWidth.toString();
-                    polyStyleNode.appendChild(newWidthNode);
+                const polyStyleNode = styleNode.getElementsByTagName('PolyStyle')[0];
+                if (polyStyleNode) {
+                    const widthNode = polyStyleNode.getElementsByTagName('width')[0];
+                    if (widthNode) {
+                        widthNode.textContent = lineWidth.toString(); // Set line width for polygon
+                    } else {
+                        const newWidthNode = this.xmlDoc.createElement('width');
+                        newWidthNode.textContent = lineWidth.toString();
+                        polyStyleNode.appendChild(newWidthNode);
+                    }
                 }
             }
+        } catch (error) {
+            throw new Error('Error applying line width to KML: ' + error.message);
         }
     }
 
@@ -117,22 +129,22 @@ class KMLUtility {
 // Example usage:
 
 // Read KML directly from text
-const kmlContent = fs.readFileSync('SMC.kml', 'utf8');
-const kmlUtility = new KMLUtility(kmlContent);
+// const kmlContent = fs.readFileSync('SMC.kml', 'utf8');
+// const kmlUtility = new KMLUtility(kmlContent);
 
 // Or read KML from an S3 URL
 // const kmlURL = 'your-s3-url';
 // const kmlUtility = new KMLUtility(kmlURL);
 
 // Apply line color
-kmlUtility.applyLineColour('#000000');
+// kmlUtility.applyLineColour('#000000');
 
 // Apply line width
-kmlUtility.applyLineWidth(5);
+// kmlUtility.applyLineWidth(5);
 
 // Apply fill color with transparency
-kmlUtility.applyFillColour('#ff0080', 50);
+// kmlUtility.applyFillColour('#ff0080', 50);
 
 // Write modified KML to a new file
-const outputFilePath = 'output.kml';
-kmlUtility.writeToFile(outputFilePath);
+// const outputFilePath = 'output.kml';
+// kmlUtility.writeToFile(outputFilePath);
