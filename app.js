@@ -11,7 +11,13 @@ function rgbToArgb(rgbColor, transparencyPercentage) {
 }
 
 
-function addOrUpdateStyle(kmlString, lineWidth, lineColor, fillTransparency, fillColor) {
+function addOrUpdateStyle(
+    kmlString,
+    lineWidth = 4,
+    lineColor = '#0000FF',
+    fillTransparency = 50,
+    fillColor = lineColor
+) {
     const parser = new DOMParser();
     const serializer = new XMLSerializer();
     const xmlDoc = parser.parseFromString(kmlString, 'text/xml');
